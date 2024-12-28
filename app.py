@@ -1,11 +1,41 @@
-import streamlit as st
+from flask import Flask, request, render_template_string
 
-# 제목
-st.title("글자를 입력하고 출력하기")
+app = Flask(__name__)
 
-# 입력 받기
-user_input = st.text_input("여기에 글자를 입력하세요:")
+# HTML 템플릿
+html_template = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>글자 띄우기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1>웹사이트에 글자를 띄우기</h1>
+    <form method="post">
+        <input type="text" name="user_input" placeholder="글자를 입력하세요">
+        <button type="submit">제출</button>
+    </form>
+    {% if user_input %}
+    <h2>입력한 내용:</h2>
+    <div style="font-size: 24px; color: blue;">{{ user_input }}</div>
+    {% endif %}
+</body>
+</html>
+"""
 
-# 출력
-if user_input:
-    st.write(f"입력한 내용: {user_input}")
+@app.route("/", methods=["GET", "POST"])
+def home():
+    user_input = None
+    if request.method == "POST":
+        user_input = request.form.get("user_input")
+    return render_template_string(html_template, user_input=user_input)
+
+if __name__ == "__main__":
+    app.run(debug=True)
